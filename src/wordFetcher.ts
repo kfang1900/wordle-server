@@ -3,6 +3,7 @@ import fs from "fs";
 import { gameState, resetGameState } from "./gameState";
 import dotenv from "dotenv";
 import { io } from "./server";
+import { COLS } from "./config";
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ export async function fetchNewWord(): Promise<void> {
     });
     let newWord =
       response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase() || null;
-    if (newWord && newWord.length === 5) {
+    if (newWord && newWord.length === COLS) {
       console.log("New Word of the Day:", newWord);
       fs.writeFileSync("/tmp/word_of_the_day.txt", newWord);
 

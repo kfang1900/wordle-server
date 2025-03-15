@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { gameState } from "./gameState";
+import { ROWS, COLS } from "./config";
 
 export function setupSocket(io: Server) {
   io.on("connection", (socket: Socket) => {
@@ -7,18 +8,22 @@ export function setupSocket(io: Server) {
 
     socket.emit("gameState", gameState);
 
-    socket.on("addLetter", ({ letter, user }: { letter: string; user: string }) => {
-      if (gameState.col < 5) {
-        gameState.board[gameState.row][gameState.col] = letter;
-        gameState.users[gameState.row][gameState.col] = user;
-        gameState.history.push({ user, letter, row: gameState.row, col: gameState.col });
-        gameState.col++;
-        io.emit("gameState", gameState);
+    socket.on(
+      "addLetter",
+      ({ letter, user, color }: { letter: string; user: string; color: string }) => {
+        if (gameState.col < COLS) {
+          gameState.board[gameState.row][gameState.col] = letter;
+          gameState.users[gameState.row][gameState.col] = user;
+          gameState.colors[gameState.row][gameState.col] = color;
+          gameState.history.push({ user, letter, row: gameState.row, col: gameState.col });
+          gameState.col++;
+          io.emit("gameState", gameState);
+        }
       }
-    });
+    );
 
-    socket.on("submitWord", (user: string) => {
-      if (gameState.col !== 5 || gameState.winner) {
+    socket.on("submitWord", ({ user, submitColors }: { user: string; submitColors: string[] }) => {
+      if (gameState.col !== COLS || gameState.winner) {
         return;
       }
 
@@ -26,17 +31,26 @@ export function setupSocket(io: Server) {
 
       console.log(`${user} submitted row ${gameState.row}: ${submittedWord}`);
       gameState.history.push({ user, action: "submit", row: gameState.row });
-
+      gameState.colors[gameState.row] = submitColors;
+      const wordSet = new Set(gameState.targetWord);
+      for (let i = 0; i < COLS; i++) {
+        const letter = gameState.board[gameState.row][i];
+        if (!wordSet.has(letter)) {
+          gameState.keyboardColors[letter] = "incorrect";
+        } else if (letter === gameState.targetWord[i]) {
+          gameState.keyboardColors[letter] = "correct";
+          // If letter guessed correctly before, leave it correct
+        } else if (gameState.keyboardColors[letter] !== "correct") {
+          gameState.keyboardColors[letter] = "misplaced";
+        }
+      }
+      gameState.row++;
+      gameState.col = 0;
       if (submittedWord === gameState.targetWord) {
         console.log(`${user} won the game!`);
         gameState.winner = user;
-        io.emit("gameState", gameState);
-        return;
       }
-      if (gameState.row < 5) {
-        gameState.row++;
-        gameState.col = 0;
-      } else {
+      if (gameState.row === ROWS && !gameState.winner) {
         console.log("No Winners.");
       }
       io.emit("gameState", gameState);
@@ -45,8 +59,9 @@ export function setupSocket(io: Server) {
     socket.on("backspace", (user: string) => {
       if (gameState.col > 0) {
         gameState.col--;
-        gameState.board[gameState.row][gameState.col] = null;
+        gameState.board[gameState.row][gameState.col] = "";
         gameState.users[gameState.row][gameState.col] = null;
+        gameState.colors[gameState.row][gameState.col] = "empty";
         gameState.history.push({
           user,
           action: "backspace",
