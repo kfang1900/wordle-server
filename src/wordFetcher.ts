@@ -13,7 +13,15 @@ const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/
 export async function fetchNewWord(): Promise<void> {
   try {
     const response = await axios.post(GEMINI_API_URL, {
-      contents: [{ parts: [{ text: "Give me a random 5-letter word." }] }],
+      contents: [
+        {
+          parts: [
+            {
+              text: "Give me a random 5-letter English word. The word should be different each time. Just return the word, in all caps, and nothing else.",
+            },
+          ],
+        },
+      ],
     });
     let newWord =
       response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase() || null;

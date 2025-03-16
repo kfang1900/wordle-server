@@ -12,7 +12,7 @@ exports.gameState = {
     row: 0,
     col: 0,
     winner: null,
-    targetWord: "PICKL",
+    targetWord: "AAAAA",
 };
 function resetGameState(newWord) {
     exports.gameState.board = Array.from({ length: config_1.ROWS }, () => Array(config_1.COLS).fill(""));

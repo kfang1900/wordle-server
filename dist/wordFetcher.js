@@ -27,7 +27,15 @@ function fetchNewWord() {
         var _a, _b, _c, _d, _e, _f, _g;
         try {
             const response = yield axios_1.default.post(GEMINI_API_URL, {
-                contents: [{ parts: [{ text: "Give me a random 5-letter word." }] }],
+                contents: [
+                    {
+                        parts: [
+                            {
+                                text: "Give me a random 5-letter English word. The word should be different each time. Just return the word, in all caps, and nothing else.",
+                            },
+                        ],
+                    },
+                ],
             });
             let newWord = ((_g = (_f = (_e = (_d = (_c = (_b = (_a = response.data) === null || _a === void 0 ? void 0 : _a.candidates) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.content) === null || _d === void 0 ? void 0 : _d.parts) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.text) === null || _g === void 0 ? void 0 : _g.trim().toUpperCase()) || null;
             if (newWord && newWord.length === config_1.COLS) {

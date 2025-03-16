@@ -14,8 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_cron_1 = __importDefault(require("node-cron"));
 const wordFetcher_1 = require("./wordFetcher");
-node_cron_1.default.schedule("0 14 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Fetching new word at 9 AM EST...");
+function testFetch() {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("Running test fetch...");
+        yield (0, wordFetcher_1.fetchNewWord)();
+        console.log("Test fetch completed.");
+    });
+}
+node_cron_1.default.schedule("* * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Testing cron job: Fetching new word...");
     yield (0, wordFetcher_1.fetchNewWord)();
 }));
+testFetch().catch(console.error);
 console.log("Daily word update scheduled for 9 AM EST.");

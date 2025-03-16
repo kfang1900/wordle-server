@@ -22,7 +22,7 @@ export let gameState: GameState = {
   row: 0,
   col: 0,
   winner: null,
-  targetWord: "PICKL",
+  targetWord: "AAAAA",
 };
 
 export function resetGameState(newWord: string) {
