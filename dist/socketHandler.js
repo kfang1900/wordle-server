@@ -1,8 +1,18 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupSocket = setupSocket;
 const gameState_1 = require("./gameState");
 const config_1 = require("./config");
+const wordFetcher_1 = require("./wordFetcher");
 function setupSocket(io) {
     io.on("connection", (socket) => {
         console.log("User connected:", socket.id);
@@ -17,7 +27,7 @@ function setupSocket(io) {
                 io.emit("gameState", gameState_1.gameState);
             }
         });
-        socket.on("submitWord", ({ user, submitColors }) => {
+        socket.on("submitWord", (_a) => __awaiter(this, [_a], void 0, function* ({ user, submitColors }) {
             if (gameState_1.gameState.col !== config_1.COLS || gameState_1.gameState.winner) {
                 return;
             }
@@ -44,12 +54,14 @@ function setupSocket(io) {
             if (submittedWord === gameState_1.gameState.targetWord) {
                 console.log(`${user} won the game!`);
                 gameState_1.gameState.winner = user;
+                yield (0, wordFetcher_1.fetchNewWord)();
             }
             if (gameState_1.gameState.row === config_1.ROWS && !gameState_1.gameState.winner) {
                 console.log("No Winners.");
+                yield (0, wordFetcher_1.fetchNewWord)();
             }
             io.emit("gameState", gameState_1.gameState);
-        });
+        }));
         socket.on("backspace", (user) => {
             if (gameState_1.gameState.col > 0) {
                 gameState_1.gameState.col--;
