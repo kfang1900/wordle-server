@@ -3,6 +3,10 @@ import { gameState } from "./gameState";
 import { ROWS, COLS } from "./config";
 import { fetchNewWord } from "./wordFetcher";
 
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function setupSocket(io: Server) {
   io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
@@ -52,13 +56,15 @@ export function setupSocket(io: Server) {
         if (submittedWord === gameState.targetWord) {
           console.log(`${user} won the game!`);
           gameState.winner = user;
-          await fetchNewWord();
         }
         if (gameState.row === ROWS && !gameState.winner) {
           console.log("No Winners.");
-          await fetchNewWord();
         }
         io.emit("gameState", gameState);
+        if (gameState.winner || gameState.row === ROWS) {
+          await delay(5000);
+          await fetchNewWord();
+        }
       }
     );
 

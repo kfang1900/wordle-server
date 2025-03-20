@@ -13,6 +13,9 @@ exports.setupSocket = setupSocket;
 const gameState_1 = require("./gameState");
 const config_1 = require("./config");
 const wordFetcher_1 = require("./wordFetcher");
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 function setupSocket(io) {
     io.on("connection", (socket) => {
         console.log("User connected:", socket.id);
@@ -54,13 +57,15 @@ function setupSocket(io) {
             if (submittedWord === gameState_1.gameState.targetWord) {
                 console.log(`${user} won the game!`);
                 gameState_1.gameState.winner = user;
-                yield (0, wordFetcher_1.fetchNewWord)();
             }
             if (gameState_1.gameState.row === config_1.ROWS && !gameState_1.gameState.winner) {
                 console.log("No Winners.");
-                yield (0, wordFetcher_1.fetchNewWord)();
             }
             io.emit("gameState", gameState_1.gameState);
+            if (gameState_1.gameState.winner || gameState_1.gameState.row === config_1.ROWS) {
+                yield delay(5000);
+                yield (0, wordFetcher_1.fetchNewWord)();
+            }
         }));
         socket.on("backspace", (user) => {
             if (gameState_1.gameState.col > 0) {
