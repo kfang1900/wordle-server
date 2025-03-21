@@ -76,6 +76,7 @@ function setupSocket(io) {
             if (submittedWord === gameState_1.gameState.targetWord) {
                 console.log(`${user} won the game!`);
                 gameState_1.gameState.winner = user;
+                io.emit("validation", "🦙🦙🦙🦙🦙");
             }
             if (gameState_1.gameState.row === config_1.ROWS && !gameState_1.gameState.winner) {
                 console.log("No Winners.");

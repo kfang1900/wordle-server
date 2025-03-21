@@ -70,6 +70,7 @@ export function setupSocket(io: Server) {
         if (submittedWord === gameState.targetWord) {
           console.log(`${user} won the game!`);
           gameState.winner = user;
+          io.emit("validation", "🦙🦙🦙🦙🦙");
         }
         if (gameState.row === ROWS && !gameState.winner) {
           console.log("No Winners.");
