@@ -17,8 +17,11 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function setupSocket(io) {
-    io.on("connection", (socket) => {
+    io.on("connection", (socket) => __awaiter(this, void 0, void 0, function* () {
         console.log("User connected:", socket.id);
+        if ((0, wordFetcher_1.getCurState)().currentWord.length !== config_1.COLS) {
+            yield (0, wordFetcher_1.setNewWord)();
+        }
         socket.emit("gameState", gameState_1.gameState);
         socket.on("addLetter", ({ letter, user, color }) => {
             if (gameState_1.gameState.col < config_1.COLS) {
@@ -64,7 +67,7 @@ function setupSocket(io) {
             io.emit("gameState", gameState_1.gameState);
             if (gameState_1.gameState.winner || gameState_1.gameState.row === config_1.ROWS) {
                 yield delay(5000);
-                yield (0, wordFetcher_1.fetchNewWord)();
+                yield (0, wordFetcher_1.setNewWord)();
             }
         }));
         socket.on("backspace", (user) => {
@@ -85,5 +88,5 @@ function setupSocket(io) {
         socket.on("disconnect", () => {
             console.log("User disconnected:", socket.id);
         });
-    });
+    }));
 }

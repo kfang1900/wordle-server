@@ -1,4 +1,5 @@
 import { ROWS, COLS } from "./config";
+
 export type GameState = {
   board: string[][];
   users: (string | null)[][];
@@ -22,7 +23,7 @@ export let gameState: GameState = {
   row: 0,
   col: 0,
   winner: null,
-  targetWord: "AAAAA",
+  targetWord: "",
 };
 
 export function resetGameState(newWord: string) {

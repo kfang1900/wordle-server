@@ -3,7 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import { setupSocket } from "./socketHandler";
-import { fetchNewWord } from "./wordFetcher";
+import { setNewWord } from "./wordFetcher";
 import cron from "node-cron";
 
 const app = express();
@@ -47,16 +47,14 @@ server.listen(PORT, async () => {
   console.log(`WebSocket server running on port ${PORT}`);
 
   try {
-    console.log("Fetching initial word...");
-    await fetchNewWord();
-    console.log("Initial word fetched.");
+    await setNewWord();
   } catch (error) {
     console.error("Error fetching initial word:", error);
   }
 
-  // Rest word at midnight
-  cron.schedule("0 0 * * *", async () => {
-    console.log("Cron job running: Fetching new word...");
-    await fetchNewWord();
-  });
+  // // Rest word at midnight
+  // cron.schedule("0 0 * * *", async () => {
+  //   console.log("Cron job running: Fetching new word...");
+  //   await setNewWord();
+  // });
 });

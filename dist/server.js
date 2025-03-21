@@ -19,7 +19,6 @@ const socket_io_1 = require("socket.io");
 const cors_1 = __importDefault(require("cors"));
 const socketHandler_1 = require("./socketHandler");
 const wordFetcher_1 = require("./wordFetcher");
-const node_cron_1 = __importDefault(require("node-cron"));
 const app = (0, express_1.default)();
 // Updated CORS configuration to allow connections from multiple origins
 const corsOptions = {
@@ -53,16 +52,14 @@ const PORT = 3001;
 server.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`WebSocket server running on port ${PORT}`);
     try {
-        console.log("Fetching initial word...");
-        yield (0, wordFetcher_1.fetchNewWord)();
-        console.log("Initial word fetched.");
+        yield (0, wordFetcher_1.setNewWord)();
     }
     catch (error) {
         console.error("Error fetching initial word:", error);
     }
-    // Rest word at midnight
-    node_cron_1.default.schedule("0 0 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("Cron job running: Fetching new word...");
-        yield (0, wordFetcher_1.fetchNewWord)();
-    }));
+    // // Rest word at midnight
+    // cron.schedule("0 0 * * *", async () => {
+    //   console.log("Cron job running: Fetching new word...");
+    //   await setNewWord();
+    // });
 }));

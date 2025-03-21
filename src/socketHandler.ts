@@ -1,16 +1,18 @@
 import { Server, Socket } from "socket.io";
 import { gameState } from "./gameState";
 import { ROWS, COLS } from "./config";
-import { fetchNewWord } from "./wordFetcher";
+import { getCurState, setNewWord } from "./wordFetcher";
 
 function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export function setupSocket(io: Server) {
-  io.on("connection", (socket: Socket) => {
+  io.on("connection", async (socket: Socket) => {
     console.log("User connected:", socket.id);
-
+    if (getCurState().currentWord.length !== COLS) {
+      await setNewWord();
+    }
     socket.emit("gameState", gameState);
 
     socket.on(
@@ -63,7 +65,7 @@ export function setupSocket(io: Server) {
         io.emit("gameState", gameState);
         if (gameState.winner || gameState.row === ROWS) {
           await delay(5000);
-          await fetchNewWord();
+          await setNewWord();
         }
       }
     );
