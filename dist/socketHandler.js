@@ -8,11 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupSocket = setupSocket;
 const gameState_1 = require("./gameState");
 const config_1 = require("./config");
 const wordFetcher_1 = require("./wordFetcher");
+const word_list_1 = __importDefault(require("word-list"));
+const fs_1 = __importDefault(require("fs"));
+const wordListText = fs_1.default.readFileSync(word_list_1.default, "utf8");
+const allEnglishWords = wordListText.split("\n");
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -34,10 +41,19 @@ function setupSocket(io) {
             }
         });
         socket.on("submitWord", (_a) => __awaiter(this, [_a], void 0, function* ({ user, submitColors }) {
-            if (gameState_1.gameState.col !== config_1.COLS || gameState_1.gameState.winner) {
+            if (gameState_1.gameState.winner) {
+                io.emit("validation", "You already won!");
+                return;
+            }
+            if (gameState_1.gameState.col < config_1.COLS) {
+                io.emit("validation", "Not enough letters");
                 return;
             }
             const submittedWord = gameState_1.gameState.board[gameState_1.gameState.row].join("");
+            if (!allEnglishWords.includes(submittedWord.toLowerCase())) {
+                io.emit("validation", "Not in word list");
+                return;
+            }
             console.log(`${user} submitted row ${gameState_1.gameState.row}: ${submittedWord}`);
             gameState_1.gameState.history.push({ user, action: "submit", row: gameState_1.gameState.row });
             gameState_1.gameState.colors[gameState_1.gameState.row] = submitColors;
@@ -63,6 +79,7 @@ function setupSocket(io) {
             }
             if (gameState_1.gameState.row === config_1.ROWS && !gameState_1.gameState.winner) {
                 console.log("No Winners.");
+                io.emit("validation", `The word was ${gameState_1.gameState.targetWord}`);
             }
             io.emit("gameState", gameState_1.gameState);
             if (gameState_1.gameState.winner || gameState_1.gameState.row === config_1.ROWS) {

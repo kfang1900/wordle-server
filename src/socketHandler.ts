@@ -2,6 +2,10 @@ import { Server, Socket } from "socket.io";
 import { gameState } from "./gameState";
 import { ROWS, COLS } from "./config";
 import { getCurState, setNewWord } from "./wordFetcher";
+import words from "word-list";
+import fs from "fs";
+const wordListText = fs.readFileSync(words, "utf8");
+const allEnglishWords = wordListText.split("\n");
 
 function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -32,12 +36,20 @@ export function setupSocket(io: Server) {
     socket.on(
       "submitWord",
       async ({ user, submitColors }: { user: string; submitColors: string[] }) => {
-        if (gameState.col !== COLS || gameState.winner) {
+        if (gameState.winner) {
+          io.emit("validation", "You already won!");
+          return;
+        }
+        if (gameState.col < COLS) {
+          io.emit("validation", "Not enough letters");
           return;
         }
 
         const submittedWord = gameState.board[gameState.row].join("");
-
+        if (!allEnglishWords.includes(submittedWord.toLowerCase())) {
+          io.emit("validation", "Not in word list");
+          return;
+        }
         console.log(`${user} submitted row ${gameState.row}: ${submittedWord}`);
         gameState.history.push({ user, action: "submit", row: gameState.row });
         gameState.colors[gameState.row] = submitColors;
@@ -61,6 +73,7 @@ export function setupSocket(io: Server) {
         }
         if (gameState.row === ROWS && !gameState.winner) {
           console.log("No Winners.");
+          io.emit("validation", `The word was ${gameState.targetWord}`);
         }
         io.emit("gameState", gameState);
         if (gameState.winner || gameState.row === ROWS) {

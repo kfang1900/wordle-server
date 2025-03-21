@@ -27,7 +27,7 @@ async function fetchNewWord(): Promise<string> {
   const usedWordsArray = Array.from(usedWords);
   const usedWordsString = usedWordsArray.join(", ");
   console.log(
-    `Give me a random 5-letter English word for a Wordle game. The word should not be ${usedWordsString} and not be plural or a proper noun. Just return the word, in all caps, and nothing else.`
+    `Give me a random 5-letter English word for a Wordle game. The word should not be ${usedWordsString}. The word should not be plural. Just return the word, in all caps, and nothing else.`
   );
   try {
     const response = await axios.post(GEMINI_API_URL, {
@@ -35,7 +35,7 @@ async function fetchNewWord(): Promise<string> {
         {
           parts: [
             {
-              text: `Give me a random 5-letter English word for a Wordle game. The word should not be ${usedWordsString} and not be plural or a proper noun. Just return the word, in all caps, and nothing else.`,
+              text: `Give me a random 5-letter English word for a Wordle game. The word should not be ${usedWordsString}. The word should not be plural. Just return the word, in all caps, and nothing else.`,
             },
           ],
         },
