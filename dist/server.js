@@ -57,9 +57,4 @@ server.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         console.error("Error fetching initial word:", error);
     }
-    // // Rest word at midnight
-    // cron.schedule("0 0 * * *", async () => {
-    //   console.log("Cron job running: Fetching new word...");
-    //   await setNewWord();
-    // });
 }));

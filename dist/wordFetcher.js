@@ -70,12 +70,13 @@ function fetchNewWord() {
 function setNewWord() {
     return __awaiter(this, void 0, void 0, function* () {
         const { usedWords } = getCurState();
+        const gamesPlayed = usedWords.size;
         let newWord = yield fetchNewWord();
         while (newWord.length !== config_1.COLS || usedWords.has(newWord)) {
             newWord = yield fetchNewWord();
         }
         console.log("New Word of the Day:", newWord);
-        (0, gameState_1.resetGameState)(newWord);
+        (0, gameState_1.resetGameState)(newWord, gamesPlayed);
         const newUsedWordsList = [...usedWords, newWord];
         const newData = { currentWord: newWord, usedWords: newUsedWordsList };
         fs_1.default.writeFileSync(filePath, JSON.stringify(newData));

@@ -57,12 +57,13 @@ async function fetchNewWord(): Promise<string> {
 
 export async function setNewWord(): Promise<void> {
   const { usedWords } = getCurState();
+  const gamesPlayed = usedWords.size;
   let newWord = await fetchNewWord();
   while (newWord.length !== COLS || usedWords.has(newWord)) {
     newWord = await fetchNewWord();
   }
   console.log("New Word of the Day:", newWord);
-  resetGameState(newWord);
+  resetGameState(newWord, gamesPlayed);
   const newUsedWordsList = [...usedWords, newWord];
   const newData = { currentWord: newWord, usedWords: newUsedWordsList };
   fs.writeFileSync(filePath, JSON.stringify(newData));

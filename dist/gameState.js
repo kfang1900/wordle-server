@@ -13,8 +13,9 @@ exports.gameState = {
     col: 0,
     winner: null,
     targetWord: "",
+    gamesPlayed: 0,
 };
-function resetGameState(newWord) {
+function resetGameState(newWord, gamesPlayed) {
     exports.gameState.board = Array.from({ length: config_1.ROWS }, () => Array(config_1.COLS).fill(""));
     exports.gameState.users = Array.from({ length: config_1.ROWS }, () => Array(config_1.COLS).fill(null));
     exports.gameState.colors = Array.from({ length: config_1.ROWS }, () => Array(config_1.COLS).fill("normal"));
@@ -24,4 +25,5 @@ function resetGameState(newWord) {
     exports.gameState.col = 0;
     exports.gameState.winner = null;
     exports.gameState.targetWord = newWord;
+    exports.gameState.gamesPlayed = gamesPlayed;
 }

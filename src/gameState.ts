@@ -10,6 +10,7 @@ export type GameState = {
   col: number;
   winner: string | null;
   targetWord: string;
+  gamesPlayed: number;
 };
 
 export let gameState: GameState = {
@@ -24,9 +25,10 @@ export let gameState: GameState = {
   col: 0,
   winner: null,
   targetWord: "",
+  gamesPlayed: 0,
 };
 
-export function resetGameState(newWord: string) {
+export function resetGameState(newWord: string, gamesPlayed: number) {
   gameState.board = Array.from({ length: ROWS }, () => Array(COLS).fill(""));
   gameState.users = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
   gameState.colors = Array.from({ length: ROWS }, () => Array(COLS).fill("normal"));
@@ -38,4 +40,5 @@ export function resetGameState(newWord: string) {
   gameState.col = 0;
   gameState.winner = null;
   gameState.targetWord = newWord;
+  gameState.gamesPlayed = gamesPlayed;
 }
