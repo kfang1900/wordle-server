@@ -46,7 +46,10 @@ export function setupSocket(io: Server) {
         }
 
         const submittedWord = gameState.board[gameState.row].join("");
-        if (!allEnglishWords.includes(submittedWord.toLowerCase())) {
+        if (
+          !allEnglishWords.includes(submittedWord.toLowerCase()) &&
+          submittedWord !== gameState.targetWord
+        ) {
           io.emit("validation", "Not in word list");
           return;
         }
