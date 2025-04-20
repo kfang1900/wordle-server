@@ -4,7 +4,6 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { setupSocket } from "./socketHandler";
 import { setNewWord } from "./wordFetcher";
-import cron from "node-cron";
 
 const app = express();
 

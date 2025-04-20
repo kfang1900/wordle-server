@@ -50,7 +50,8 @@ function setupSocket(io) {
                 return;
             }
             const submittedWord = gameState_1.gameState.board[gameState_1.gameState.row].join("");
-            if (!allEnglishWords.includes(submittedWord.toLowerCase())) {
+            if (!allEnglishWords.includes(submittedWord.toLowerCase()) &&
+                submittedWord !== gameState_1.gameState.targetWord) {
                 io.emit("validation", "Not in word list");
                 return;
             }

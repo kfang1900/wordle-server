@@ -1,13 +1,18 @@
-import axios from "axios";
 import fs from "fs";
 import { gameState, resetGameState } from "./gameState";
-import dotenv from "dotenv";
 import { io } from "./server";
-import { COLS } from "./config";
-
-dotenv.config();
+import words from "word-list";
 
 const filePath = "./word.json";
+
+function getRandomWord(): string {
+  const wordListText = fs.readFileSync(words, "utf8");
+  const allEnglishWords = wordListText.split("\n");
+  const fiveLetterWords = allEnglishWords.filter(word => word.length === 5 && !word.endsWith("s"));
+
+  const randomIndex = Math.floor(Math.random() * fiveLetterWords.length);
+  return fiveLetterWords[randomIndex].toUpperCase();
+}
 
 export function getCurState(): { currentWord: string; usedWords: Set<string> } {
   if (!fs.existsSync(filePath)) {
@@ -19,49 +24,26 @@ export function getCurState(): { currentWord: string; usedWords: Set<string> } {
   return { currentWord: data.currentWord, usedWords: new Set(data.usedWords) };
 }
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-async function fetchNewWord(): Promise<string> {
+function fetchNewWord(): string {
   const { usedWords } = getCurState();
-  const usedWordsArray = Array.from(usedWords);
-  const usedWordsString = usedWordsArray.join(", ");
-  console.log(
-    `Give me a random 5-letter English word for a Wordle game. The word should not be ${usedWordsString}. The word should not be plural. Just return the word, in all caps, and nothing else.`
-  );
-  try {
-    const response = await axios.post(GEMINI_API_URL, {
-      contents: [
-        {
-          parts: [
-            {
-              text: `Give me a random 5-letter English word for a Wordle game. The word should not be ${usedWordsString}. The word should not be plural. Just return the word, in all caps, and nothing else.`,
-            },
-          ],
-        },
-      ],
-    });
-    const newWord =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase() || null;
-    if (newWord && newWord.length === COLS) {
+  let attempts = 0;
+  let newWord;
+
+  while (attempts < 100) {
+    newWord = getRandomWord();
+    if (!usedWords.has(newWord)) {
       return newWord;
-    } else {
-      console.log("Invalid word received:", newWord);
-      return "";
     }
-  } catch (error) {
-    console.log("Failed to fetch word:", error);
-    return "";
+    attempts++;
   }
+  // If all attempts fail, just return a word
+  return getRandomWord();
 }
 
-export async function setNewWord(): Promise<void> {
+export function setNewWord(): void {
   const { usedWords } = getCurState();
   const gamesPlayed = usedWords.size;
-  let newWord = await fetchNewWord();
-  while (newWord.length !== COLS || usedWords.has(newWord)) {
-    newWord = await fetchNewWord();
-  }
+  let newWord = fetchNewWord();
   console.log("New Word of the Day:", newWord);
   resetGameState(newWord, gamesPlayed);
   const newUsedWordsList = [...usedWords, newWord];
