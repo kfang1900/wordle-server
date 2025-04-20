@@ -86,7 +86,7 @@ function setupSocket(io) {
             io.emit("gameState", gameState_1.gameState);
             if (gameState_1.gameState.winner || gameState_1.gameState.row === config_1.ROWS) {
                 yield delay(5000);
-                yield (0, wordFetcher_1.setNewWord)();
+                (0, wordFetcher_1.setNewWord)("gameWon");
             }
         }));
         socket.on("backspace", (user) => {

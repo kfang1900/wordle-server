@@ -46,7 +46,7 @@ server.listen(PORT, async () => {
   console.log(`WebSocket server running on port ${PORT}`);
 
   try {
-    await setNewWord();
+    setNewWord("serverRestart");
   } catch (error) {
     console.error("Error fetching initial word:", error);
   }

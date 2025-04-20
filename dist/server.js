@@ -52,7 +52,7 @@ const PORT = 3001;
 server.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`WebSocket server running on port ${PORT}`);
     try {
-        yield (0, wordFetcher_1.setNewWord)();
+        (0, wordFetcher_1.setNewWord)("serverRestart");
     }
     catch (error) {
         console.error("Error fetching initial word:", error);

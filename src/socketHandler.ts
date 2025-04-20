@@ -82,7 +82,7 @@ export function setupSocket(io: Server) {
         io.emit("gameState", gameState);
         if (gameState.winner || gameState.row === ROWS) {
           await delay(5000);
-          await setNewWord();
+          setNewWord("gameWon");
         }
       }
     );
