@@ -95,7 +95,6 @@ function setNewWord(reason = "gameWon") {
         newWord = fetchNewWord();
         console.log("New Word of the Day:", newWord);
     }
-    console.log("New Word of the Day:", newWord);
     (0, gameState_1.resetGameState)(newWord, gamesPlayed);
     const newUsedWordsList = reason === "serverRestart" ? [...usedWords] : [...usedWords, newWord];
     const newData = {
